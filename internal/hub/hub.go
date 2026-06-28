@@ -2,31 +2,51 @@ package hub
 
 import (
 	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
+	"sync"
 )
 
-type MessagePayload struct {
-	RoomID uuid.UUID
-	Data   []byte
-}
-
 type Hub struct {
-	Users map[uuid.UUID]map[uuid.UUID]*Client
-
-	Rooms map[uuid.UUID]map[*Client]bool
-
-	Broadcast chan MessagePayload
-
-	Register   chan *Client
-	Unregister chan *Client
+	mu    sync.RWMutex
+	users map[uuid.UUID]map[uuid.UUID]*Client
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		Users:      make(map[uuid.UUID]map[uuid.UUID]*Client),
-		Rooms:      make(map[uuid.UUID]map[*Client]bool),
-		Broadcast:  make(chan MessagePayload),
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
+		users: make(map[uuid.UUID]map[uuid.UUID]*Client),
 	}
+}
+
+func (h *Hub) Register(c *Client) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	if _, exists := h.users[c.UserID]; !exists {
+		h.users[c.UserID] = make(map[uuid.UUID]*Client)
+	}
+	h.users[c.UserID][c.DeviceID] = c
+}
+
+func (h *Hub) Unregister(userID, deviceID uuid.UUID) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	if devices, exists := h.users[userID]; exists {
+		delete(devices, deviceID)
+		if len(devices) == 0 {
+			delete(h.users, userID)
+		}
+	}
+}
+
+func (h *Hub) SendToDevice(userID, deviceID uuid.UUID, payload []byte) bool {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	if devices, exists := h.users[userID]; exists {
+		if client, connected := devices[deviceID]; connected {
+			client.Send <- payload
+			return true
+		}
+	}
+	return false
 }

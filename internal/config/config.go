@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/BurntSushi/toml"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -39,8 +40,10 @@ func (d DatabaseConfig) DSN() string {
 }
 
 func Load(path string) (*Config, error) {
+	_ = godotenv.Load()
+
 	var cfg Config
-	if _, err := os.Stat(path); err == nil {
+	if _, err := os.Stat(path); err == nil && path != ".env" {
 		if _, err := toml.DecodeFile(path, &cfg); err != nil {
 			return nil, fmt.Errorf("failed to load config from %s: %w", path, err)
 		}

@@ -5,8 +5,8 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     environment:
       APP_PORT: ${APP_PORT}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
@@ -17,7 +17,6 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
-
   postgres:
     image: postgres:17-alpine
     environment:

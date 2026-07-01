@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gisuNasr/GoWhisper/internal/config"
 	"github.com/gisuNasr/GoWhisper/internal/storage"
 
@@ -21,5 +23,10 @@ func main() {
 
 	defer db.Close()
 
+	err = http.ListenAndServe(cfg.Server.Addr(), nil)
+	if err != nil {
+		log.Fatalf("failed to start server: %v", err)
+	}
 	fmt.Println("application is up and running")
+
 }

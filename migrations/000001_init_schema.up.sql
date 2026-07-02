@@ -7,6 +7,7 @@ CREATE TABLE users (
    last_name VARCHAR(50),
    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
 CREATE TABLE devices (
@@ -16,7 +17,8 @@ CREATE TABLE devices (
    signed_pre_key_pub TEXT NOT NULL,
    one_time_pre_keys JSONB NOT NULL,
    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+   deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
 CREATE TABLE rooms (

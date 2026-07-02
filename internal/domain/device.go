@@ -1,6 +1,11 @@
 package domain
 
-import "encoding/json"
+import (
+	"context"
+	"encoding/json"
+
+	"github.com/google/uuid"
+)
 
 type Device struct {
 	BaseModel
@@ -8,4 +13,14 @@ type Device struct {
 	IdentityKeyPub  string          `json:"identity_key_pub"`
 	SignedPreKeyPub string          `json:"signed_pre_key_pub"`
 	OneTimePreKeys  json.RawMessage `json:"one_time_pre_keys"`
+	SoftDelete
+}
+
+type DeviceRepository interface {
+	Create(ctx context.Context, device *Device) error
+	GetByUserID(ctx context.Context, userID uuid.UUID) ([]*Device, error)
+	Delete(ctx context.Context, device *Device) error
+	UpdateSignedPreKey(ctx context.Context, deviceID uuid.UUID, newPubKey string) error
+	ClaimOneTimePreKey(ctx context.Context, deviceID uuid.UUID) (string, error)
+	AddOneTimePreKeys(ctx context.Context, deviceID uuid.UUID, newKeys []string) error
 }

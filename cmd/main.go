@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gisuNasr/GoWhisper/internal/config"
-	"github.com/gisuNasr/GoWhisper/internal/infrastructure"
+	"github.com/gisuNasr/GoWhisper/internal/infrastructure/persistence"
 
 	"log"
 )
@@ -16,7 +16,7 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	db, err := infrastructure.InitDb(cfg.Database.DSN())
+	db, err := persistence.InitDb(cfg.Database.DSN())
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}
@@ -27,6 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
+
 	fmt.Println("application is up and running")
 
 }

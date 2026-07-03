@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gisuNasr/GoWhisper/internal/config"
-	"github.com/gisuNasr/GoWhisper/internal/storage"
+	"github.com/gisuNasr/GoWhisper/internal/infrastructure"
 
 	"log"
 )
@@ -16,7 +16,7 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	db, err := storage.InitDb(cfg.Database.DSN())
+	db, err := infrastructure.InitDb(cfg.Database.DSN())
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}

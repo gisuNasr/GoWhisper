@@ -24,8 +24,8 @@ type Message struct {
 }
 
 type MessageRepository interface {
-	Create(ctx context.Context, msg *Message) error
-	GetChatHistory(ctx context.Context, roomID uuid.UUID, limit int, before time.Time) ([]*Message, error)
+	Create(ctx context.Context, message *Message) error
+	GetChatHistory(ctx context.Context, roomID uuid.UUID, before time.Time) ([]*Message, error)
 	GetPendingMessages(ctx context.Context, deviceID uuid.UUID) ([]*Message, error)
 	UpdateStatus(ctx context.Context, messageID uuid.UUID, status MessageStatus) error
 }

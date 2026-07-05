@@ -20,8 +20,8 @@ type Room struct {
 }
 
 type RoomMember struct {
-	RoomID int64 `json:"room_id"`
-	UserID int64 `json:"user_id"`
+	RoomID uuid.UUID `json:"room_id" gorm:"primaryKey"`
+	UserID uuid.UUID `json:"user_id" gorm:"primaryKey"`
 }
 
 type RoomRepository interface {
@@ -34,5 +34,10 @@ type RoomMemberRepository interface {
 	AddMemberToRoom(ctx context.Context, roomID, userId uuid.UUID) error
 	RemoveMemberFromRoom(ctx context.Context, roomID, userId uuid.UUID) error
 	GetRoomMembers(ctx context.Context, roomID uuid.UUID) ([]*User, error)
-	GetUserRooms(ctx context.Context, user uuid.UUID) ([]*Room, error)
+	GetUserRooms(ctx context.Context, userID uuid.UUID) ([]*Room, error)
+}
+
+type RoomAggregatorRepository interface {
+	RoomRepository
+	RoomMemberRepository
 }

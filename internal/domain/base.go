@@ -12,6 +12,7 @@ type BaseModel struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type SoftDelete struct {
+type BaseModelWithSoftDelete struct {
+	BaseModel
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }

@@ -15,7 +15,7 @@ CREATE TABLE devices (
    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
    identity_key_pub TEXT NOT NULL,
    signed_pre_key_pub TEXT NOT NULL,
-   one_time_pre_keys JSONB NOT NULL,
+   one_time_pre_keys JSONB NOT NULL DEFAULT '[]'::jsonb,
    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
@@ -41,6 +41,8 @@ CREATE TABLE messages (
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       device_id UUID NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
       encrypted_payload TEXT NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending'
+          CHECK (status IN ('pending', 'delivered')),
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
       updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

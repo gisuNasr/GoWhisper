@@ -6,10 +6,17 @@ import (
 	"github.com/google/uuid"
 )
 
+type RoomType string
+
+const (
+	RoomTypePV    RoomType = "pv"
+	RoomTypeGroup RoomType = "group"
+)
+
 type Room struct {
 	BaseModel
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name string   `json:"name"`
+	Type RoomType `json:"type"`
 }
 
 type RoomMember struct {

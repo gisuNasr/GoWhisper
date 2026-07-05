@@ -7,11 +7,10 @@ import (
 )
 
 type User struct {
-	BaseModel
+	BaseModelWithSoftDelete
 	UserName  string `json:"username"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
-	SoftDelete
 }
 
 type UserRepository interface {

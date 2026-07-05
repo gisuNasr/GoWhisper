@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gisuNasr/GoWhisper/internal/config"
-	"github.com/gisuNasr/GoWhisper/internal/infrastructure/persistence"
+	"github.com/gisuNasr/GoWhisper/internal/infrastructure/persistence/database"
 
 	"log"
 )
@@ -16,12 +16,12 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	db, err := persistence.InitDb(cfg.Database.DSN())
+	err = database.InitDb(cfg.Database.DSN())
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}
 
-	defer db.Close()
+	defer database.CloseDb()
 
 	err = http.ListenAndServe(cfg.Server.Addr(), nil)
 	if err != nil {

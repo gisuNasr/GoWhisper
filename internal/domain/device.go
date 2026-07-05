@@ -18,7 +18,7 @@ type Device struct {
 type DeviceRepository interface {
 	Create(ctx context.Context, device *Device) error
 	GetByUserID(ctx context.Context, userID uuid.UUID) ([]*Device, error)
-	Delete(ctx context.Context, device *Device) error
+	Delete(ctx context.Context, deviceID uuid.UUID) error
 	UpdateSignedPreKey(ctx context.Context, deviceID uuid.UUID, newPubKey string) error
 	ClaimOneTimePreKey(ctx context.Context, deviceID uuid.UUID) (string, error)
 	AddOneTimePreKeys(ctx context.Context, deviceID uuid.UUID, newKeys []string) error

@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"log"
 	"sync"
 
 	"github.com/google/uuid"
@@ -45,9 +46,22 @@ func (h *Hub) SendToDevice(userID, deviceID uuid.UUID, payload []byte) bool {
 
 	if devices, exists := h.users[userID]; exists {
 		if client, connected := devices[deviceID]; connected {
-			client.Send <- payload
-			return true
+			select {
+			case client.Send <- payload:
+				return true
+			default:
+				log.Printf("hub: send buffer full for device %s — message will be stored as pending", deviceID)
+				return false
+			}
 		}
 	}
 	return false
+}
+
+func (h *Hub) IsOnline(userID uuid.UUID) bool {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	devices, exists := h.users[userID]
+	return exists && len(devices) > 0
 }

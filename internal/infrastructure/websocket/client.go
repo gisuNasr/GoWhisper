@@ -68,3 +68,27 @@ func (c *Client) WritePump(ctx context.Context) {
 		}
 	}
 }
+func (c *Client) ReadPump(ctx context.Context, cancel context.CancelFunc, onMessage func([]byte)) {
+	defer cancel()
+
+	c.Conn.SetReadLimit(512 * 1024)
+	_ = c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.Conn.SetPongHandler(func(string) error {
+		return c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	})
+
+	for {
+		_, msg, err := c.Conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err,
+				websocket.CloseGoingAway,
+				websocket.CloseAbnormalClosure,
+				websocket.CloseNormalClosure,
+			) {
+				log.Printf("ws unexpected close user=%s device=%s: %v", c.UserID, c.DeviceID, err)
+			}
+			return
+		}
+		onMessage(msg)
+	}
+}

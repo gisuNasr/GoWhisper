@@ -9,11 +9,11 @@ import (
 )
 
 type UserService struct {
-	UserRepository domain.UserRepository
+	repo domain.UserRepository
 }
 
-func NewUserService(userRepository domain.UserRepository) *UserService {
-	return &UserService{UserRepository: userRepository}
+func NewUserService(repo domain.UserRepository) *UserService {
+	return &UserService{repo}
 }
 
 func (s *UserService) Create(ctx context.Context, req dto.CreateUserRequest) (*dto.UserResponse, error) {
@@ -28,14 +28,14 @@ func (s *UserService) Create(ctx context.Context, req dto.CreateUserRequest) (*d
 	}
 	user.ID = uuid.New()
 
-	if err := s.UserRepository.Create(ctx, user); err != nil {
+	if err := s.repo.Create(ctx, user); err != nil {
 		return nil, err
 	}
 	return dto.ToUserResponse(user), nil
 }
 
 func (s *UserService) GetByID(ctx context.Context, id uuid.UUID) (*dto.UserResponse, error) {
-	user, err := s.UserRepository.GetByID(ctx, id)
+	user, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (s *UserService) GetByID(ctx context.Context, id uuid.UUID) (*dto.UserRespo
 }
 
 func (s *UserService) GetByUsername(ctx context.Context, username string) (*dto.UserResponse, error) {
-	user, err := s.UserRepository.GetByUsername(ctx, username)
+	user, err := s.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}

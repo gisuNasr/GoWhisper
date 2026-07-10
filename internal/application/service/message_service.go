@@ -22,7 +22,7 @@ func NewMessageService(repo domain.MessageRepository, h domain.MessageDispatcher
 	}
 }
 
-func (s *MessageService) Dispatch(ctx context.Context, req dto.DispatchMessageRequest) (*dto.MessageResponse, error) {
+func (s *MessageService) ProcessNewMessage(ctx context.Context, req dto.DispatchMessageRequest) (*dto.MessageResponse, error) {
 	if req.EncryptedPayload == "" {
 		return nil, domain.ErrInvalidInput
 	}
@@ -44,35 +44,12 @@ func (s *MessageService) Dispatch(ctx context.Context, req dto.DispatchMessageRe
 	res := dto.ToMessageResponse(message)
 	payload, err := json.Marshal(res)
 	if err == nil {
-		if delivered := s.hub.SendToDevice(req.UserID, req.RoomID, payload); delivered {
+		if delivered := s.hub.SendToDevice(req.UserID, req.DeviceID, payload); delivered {
 			_ = s.repo.UpdateStatus(ctx, message.ID, domain.MessageStatusDelivered)
 			res.Status = string(domain.MessageStatusDelivered)
 		}
 	}
 
-	return res, nil
-}
-
-func (s *MessageService) Send(ctx context.Context, req dto.SendMessageRequest) (*dto.MessageResponse, error) {
-	if req.EncryptedPayload == "" {
-		return nil, domain.ErrInvalidInput
-	}
-
-	message := &domain.Message{
-		RoomID:           req.RoomID,
-		UserID:           req.UserID,
-		DeviceID:         req.DeviceID,
-		EncryptedPayload: req.EncryptedPayload,
-		Status:           domain.MessageStatusPending,
-	}
-
-	message.ID = uuid.New()
-
-	if err := s.repo.Create(ctx, message); err != nil {
-		return nil, err
-	}
-
-	res := dto.ToMessageResponse(message)
 	return res, nil
 }
 

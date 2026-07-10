@@ -45,7 +45,36 @@ func (s *RoomService) Delete(ctx context.Context, id uuid.UUID) error {
 	return s.repo.DeleteRoom(ctx, id)
 }
 
-//AddMemberToRoom(ctx context.Context, roomID, userId uuid.UUID) error
-//RemoveMemberFromRoom(ctx context.Context, roomID, userId uuid.UUID) error
-//GetRoomMembers(ctx context.Context, roomID uuid.UUID) ([]*User, error)
-//GetUserRooms(ctx context.Context, userID uuid.UUID) ([]*Room, error)
+func (s *RoomService) AddMember(ctx context.Context, roomID, userId uuid.UUID) error {
+	return s.repo.AddMemberToRoom(ctx, roomID, userId)
+}
+
+func (s *RoomService) RemoveMember(ctx context.Context, roomID, userId uuid.UUID) error {
+	return s.repo.RemoveMemberFromRoom(ctx, roomID, userId)
+}
+
+func (s *RoomService) GetRoomMembers(ctx context.Context, roomID uuid.UUID) ([]*dto.UserResponse, error) {
+	users, err := s.repo.GetRoomMembers(ctx, roomID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*dto.UserResponse, len(users))
+	for i, user := range users {
+		result[i] = dto.ToUserResponse(user)
+	}
+	return result, err
+}
+
+func (s *RoomService) GetUserRooms(ctx context.Context, userID uuid.UUID) ([]*dto.RoomResponse, error) {
+	rooms, err := s.repo.GetUserRooms(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*dto.RoomResponse, len(rooms))
+	for i, room := range rooms {
+		result[i] = dto.ToRoomResponse(room)
+	}
+	return result, err
+}
